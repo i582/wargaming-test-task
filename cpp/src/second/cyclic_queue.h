@@ -23,39 +23,39 @@ namespace test_tasks
             _size = Count;
         }
 
-        cyclic_queue(const cyclic_queue& _Right)
+        cyclic_queue(const cyclic_queue& right)
         {
-            if (this != _STD addressof(_Right))
+            if (this != _STD addressof(right))
             {
-                assign(_Right);
+                assign(right);
             }
         }
 
-        cyclic_queue(cyclic_queue&& _Right) noexcept
+        cyclic_queue(cyclic_queue&& right) noexcept
         {
-            if (this != _STD addressof(_Right))
+            if (this != _STD addressof(right))
             {
-                assign(_Right);
+                assign(right);
             }
         }
 
 
     public:
-        cyclic_queue& operator=(const cyclic_queue& _Right)
+        cyclic_queue& operator=(const cyclic_queue& right)
         {
-            if (this != _STD addressof(_Right))
+            if (this != _STD addressof(right))
             {
-                assign(_Right);
+                assign(right);
             }
 
             return *this;
         }
 
-        cyclic_queue& operator=(cyclic_queue&& _Right) noexcept
+        cyclic_queue& operator=(cyclic_queue&& right) noexcept
         {
-            if (this != _STD addressof(_Right))
+            if (this != _STD addressof(right))
             {
-                assign(_Right);
+                assign(right);
             }
 
             return *this;
@@ -126,33 +126,33 @@ namespace test_tasks
 
 
     private:
-        void assign(cyclic_queue& _Right) noexcept
+        void assign(cyclic_queue& right) noexcept
         {
-            if (_size != obj._size)
+            if (_size != right._size)
                 throw std::logic_error("The size of the queue for copying is not equal to the size of the created queue!")
 
-            _head = obj._head;
-            _tail = obj._tail;
-            _count = obj._count;
+            _head = right._head;
+            _tail = right._tail;
+            _count = right._count;
 
             for (int i = 0; i < Count; ++i)
             {
-                _items[i] = obj._items[i];
+                _items[i] = right._items[i];
             }
         }
 
-        void assign(cyclic_queue&& _Right)
+        void assign(cyclic_queue&& right)
         {
-            if (_size != _Right._size)
+            if (_size != right._size)
                 throw std::logic_error("The size of the queue for copying is not equal to the size of the created queue!")
 
-            _head = _Right._head;
-            _tail = _Right._tail;
-            _count = _Right._count;
+            _head = right._head;
+            _tail = right._tail;
+            _count = right._count;
 
             for (int i = 0; i < Count; ++i)
             {
-                _items[i] = _STD move(_Right._items[i]);
+                _items[i] = _STD move(right._items[i]);
             }
         }
 
