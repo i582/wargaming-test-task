@@ -25,39 +25,25 @@ namespace test_tasks
 
         cyclic_queue(const cyclic_queue& right)
         {
-            if (this != _STD addressof(right))
-            {
-                assign(right);
-            }
+            assign(right);
         }
 
         cyclic_queue(cyclic_queue&& right) noexcept
         {
-            if (this != _STD addressof(right))
-            {
-                assign(right);
-            }
+            assign(right);
         }
 
 
     public:
         cyclic_queue& operator=(const cyclic_queue& right)
         {
-            if (this != _STD addressof(right))
-            {
-                assign(right);
-            }
-
+            assign(right);
             return *this;
         }
 
         cyclic_queue& operator=(cyclic_queue&& right) noexcept
         {
-            if (this != _STD addressof(right))
-            {
-                assign(right);
-            }
-
+            assign(right);
             return *this;
         }
 
@@ -66,13 +52,13 @@ namespace test_tasks
             if (full())
                 throw std::logic_error("Queue is full!");
 
-            _items[_head] = _STD move(item);
+            _items[_head] = std::move(item);
 
             ++_count;
             _head = next_index(_head);
         }
 
-        void push(ItemType& item)
+        void push(const ItemType& item)
         {
             if (full())
                 throw std::logic_error("Queue is full!");
@@ -126,8 +112,11 @@ namespace test_tasks
 
 
     private:
-        void assign(cyclic_queue& right) noexcept
+        void assign(const cyclic_queue& right) noexcept
         {
+            if (this == std::addressof(right))
+                return;
+
             if (_size != right._size)
                 throw std::logic_error("The size of the queue for copying is not equal to the size of the created queue!")
 
@@ -143,6 +132,9 @@ namespace test_tasks
 
         void assign(cyclic_queue&& right)
         {
+            if (this == std::addressof(right))
+                return;
+
             if (_size != right._size)
                 throw std::logic_error("The size of the queue for copying is not equal to the size of the created queue!")
 
@@ -152,7 +144,7 @@ namespace test_tasks
 
             for (int i = 0; i < Count; ++i)
             {
-                _items[i] = _STD move(right._items[i]);
+                _items[i] = std::move(right._items[i]);
             }
         }
 
