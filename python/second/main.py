@@ -46,11 +46,14 @@ class CyclesQueue:
         return temp
 
 
-queue = CyclesQueue(2)
+if __name__ == '__main__':
+    queue = CyclesQueue(2)
 
-queue.push(100)
-queue.push(100)
+    queue.push(100)
+    queue.push(100)
 
-queue.pop()
+    queue.pop()
 
-queue.push(100)
+    queue.push(100)
+
+    print(queue.pop())
