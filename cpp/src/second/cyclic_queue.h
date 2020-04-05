@@ -74,7 +74,7 @@ namespace test_tasks
             if (empty())
                 throw std::logic_error("Queue is empty!");
 
-            value_type item = _items[_tail];
+            value_type item = std::move(_items[_tail]);
 
             --_count;
             _tail = next_index(_tail);
