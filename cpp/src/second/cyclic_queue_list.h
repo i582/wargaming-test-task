@@ -17,7 +17,7 @@ namespace test_tasks
     class cyclic_queue_list
     {
     public:
-        using value_type        = ItemType;
+        using value_type        = ItemType; 
         using list              = cyclic_queue_list_item<value_type>;
         using list_pointer      = list*;
 
@@ -54,7 +54,7 @@ namespace test_tasks
             return *this;
         }
 
-        cyclic_queue_list& operator=(cyclic_queue_list&& _Right) noexcept
+        cyclic_queue_list& operator=(cyclic_queue_list&& right) noexcept
         {
             assign(right);
             return *this;
