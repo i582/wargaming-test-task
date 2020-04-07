@@ -3,7 +3,7 @@ project(wargaming_test_tasks_tests)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(gtest_force_shared_crt 1)
+option(gtest_force_shared_crt 1)
 
 set(TEST_SOURCES
         ../src/first/is_even.h
