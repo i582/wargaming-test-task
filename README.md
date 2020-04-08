@@ -219,7 +219,7 @@ bool isEven2(int) ENDP                              ; isEven2
 
 **Python:**
 
-1. Реализация через индексы: [ссылка](https://github.com/i582/wargaming-test-task/blob/master/python/second/CyclesQueue/arrayImpl.py).
+1. Реализация через индексы: [ссылка](https://github.com/i582/wargaming-test-task/blob/master/python/second/CyclesQueue/arrayImpl.py);
 2. Реализация с помощью связных списков: [ссылка](https://github.com/i582/wargaming-test-task/blob/master/python/second/CyclesQueue/listImpl.py).
 
 
