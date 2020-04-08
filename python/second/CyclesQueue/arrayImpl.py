@@ -44,16 +44,3 @@ class CyclesQueue:
         if temp >= self._size:
             temp = 0
         return temp
-
-
-if __name__ == '__main__':
-    queue = CyclesQueue(2)
-
-    queue.push(100)
-    queue.push(100)
-
-    queue.pop()
-
-    queue.push(100)
-
-    print(queue.pop())

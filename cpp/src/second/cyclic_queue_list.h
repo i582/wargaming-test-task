@@ -17,7 +17,7 @@ namespace test_tasks
     class cyclic_queue_list
     {
     public:
-        using value_type        = ItemType; 
+        using value_type        = ItemType;
         using list              = cyclic_queue_list_item<value_type>;
         using list_pointer      = list*;
 
