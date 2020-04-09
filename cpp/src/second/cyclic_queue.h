@@ -30,7 +30,7 @@ namespace test_tasks
 
         cyclic_queue(cyclic_queue&& right) noexcept
         {
-            assign(right);
+            assign(std::forward<cyclic_queue>(right));
         }
 
 
@@ -43,11 +43,11 @@ namespace test_tasks
 
         cyclic_queue& operator=(cyclic_queue&& right) noexcept
         {
-            assign(right);
+            assign(std::forward<cyclic_queue>(right));
             return *this;
         }
 
-        void push(ItemType&& item)
+        void push(value_type&& item)
         {
             if (full())
                 throw std::logic_error("Queue is full!");
@@ -58,7 +58,7 @@ namespace test_tasks
             _head = next_index(_head);
         }
 
-        void push(const ItemType& item)
+        void push(const value_type& item)
         {
             if (full())
                 throw std::logic_error("Queue is full!");
@@ -112,17 +112,15 @@ namespace test_tasks
 
 
     private:
-        void assign(const cyclic_queue& right) noexcept
+        void assign(const cyclic_queue& right)
         {
             if (this == std::addressof(right))
                 return;
 
-            if (_size != right._size)
-                throw std::logic_error("The size of the queue for copying is not equal to the size of the created queue!")
-
             _head = right._head;
             _tail = right._tail;
             _count = right._count;
+            _size = right._size;
 
             for (int i = 0; i < Count; ++i)
             {
@@ -130,17 +128,19 @@ namespace test_tasks
             }
         }
 
-        void assign(cyclic_queue&& right)
+        void assign(cyclic_queue&& right) noexcept
         {
             if (this == std::addressof(right))
                 return;
 
-            if (_size != right._size)
-                throw std::logic_error("The size of the queue for copying is not equal to the size of the created queue!")
-
             _head = right._head;
             _tail = right._tail;
             _count = right._count;
+            _size = right._size;
+
+            right._head = 0;
+            right._tail = 0;
+            right._count = 0;
 
             for (int i = 0; i < Count; ++i)
             {

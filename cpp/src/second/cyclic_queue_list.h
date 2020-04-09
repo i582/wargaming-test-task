@@ -5,11 +5,58 @@
 
 namespace test_tasks
 {
+
     template <typename ItemType>
-    struct cyclic_queue_list_item
+    class cyclic_queue_list_item
     {
+        using list_item = cyclic_queue_list_item;
+
+
+    public:
         ItemType value;
-        cyclic_queue_list_item* next;
+        list_item* next;
+
+
+    public:
+        cyclic_queue_list_item() = default;
+
+        cyclic_queue_list_item(const list_item& right)
+        {
+            assign(right);
+        }
+
+        cyclic_queue_list_item(list_item&& right) noexcept
+        {
+            assign(std::forward<cyclic_queue_list_item>(right));
+        }
+
+
+    public:
+        list_item& operator=(const list_item& right)
+        {
+            assign(right);
+            return *this;
+        }
+
+        list_item& operator=(list_item&& right) noexcept
+        {
+            assign(std::forward<cyclic_queue_list_item>(right));
+            return *this;
+        }
+
+
+    private:
+        void assign(const list_item& right)
+        {
+            value = right.value;
+            next = right.next;
+        }
+
+        void assign(list_item&& right) noexcept
+        {
+            value = std::move(right.value);
+            next = std::move(right.next);
+        }
     };
 
 
@@ -43,7 +90,7 @@ namespace test_tasks
 
         cyclic_queue_list(cyclic_queue_list&& right) noexcept
         {
-            assign(right);
+            assign(std::forward<cyclic_queue_list>(right));
         }
 
 
@@ -56,11 +103,11 @@ namespace test_tasks
 
         cyclic_queue_list& operator=(cyclic_queue_list&& right) noexcept
         {
-            assign(right);
+            assign(std::forward<cyclic_queue_list>(right));
             return *this;
         }
 
-        void push(ItemType&& item)
+        void push(value_type&& item)
         {
             if (full())
                 throw std::logic_error("Queue is full!");
@@ -71,7 +118,7 @@ namespace test_tasks
             _head = _head->next;
         }
 
-        void push(ItemType& item)
+        void push(value_type& item)
         {
             if (full())
                 throw std::logic_error("Queue is full!");
@@ -130,17 +177,12 @@ namespace test_tasks
             if (this == std::addressof(right))
                 return;
 
-            if (_size != right._size)
-                throw std::logic_error("The size of the queue for copying is not equal to the size of the created queue!")
-
-            _head = right._head;
-            _tail = right._tail;
-            _count = right._count;
-
             for (int i = 0; i < Count; ++i)
             {
                 _items[i] = right._items[i];
             }
+
+            assign_setup(right);
         }
 
         void assign(cyclic_queue_list&& right) noexcept
@@ -148,17 +190,38 @@ namespace test_tasks
             if (this == std::addressof(right))
                 return;
 
-            if (_size != right._size)
-                throw std::logic_error("The size of the queue for copying is not equal to the size of the created queue!")
-
-            _head = right._head;
-            _tail = right._tail;
-            _count = right._count;
-
             for (int i = 0; i < Count; ++i)
             {
                 _items[i] = std::move(right._items[i]);
             }
+
+            assign_setup(right);
+
+            right._head = 0;
+            right._tail = 0;
+            right._count = 0;
+        }
+
+        void assign_setup(const cyclic_queue_list& right) noexcept
+        {
+            // reset pointer for list
+            for (int i = 0; i < Count - 1; ++i)
+            {
+                _items[i].next = &_items[i + 1];
+            }
+            _items[Count - 1].next = &_items[0];
+
+
+            // some pointer magic
+            // calculate shift for start of array
+            size_t right_index_head = static_cast<int>(right._head - &right._items[0]) / sizeof(right._head);
+            size_t right_index_tail = static_cast<int>(right._tail - &right._items[0]) / sizeof(right._tail);
+
+            // and here set new pointers
+            _head = _items + right_index_head;
+            _tail = _items + right_index_tail;
+            _count = right._count;
+            _size = right._size;
         }
 
     };
