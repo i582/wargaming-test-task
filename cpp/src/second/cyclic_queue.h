@@ -6,7 +6,7 @@
 namespace test_tasks
 {
 
-    template <typename ItemType, size_t Count>
+    template <typename ItemType, size_t Size>
     class cyclic_queue
     {
     public:
@@ -20,7 +20,6 @@ namespace test_tasks
             _head = 0;
             _tail = 0;
             _count = 0;
-            _size = Count;
         }
 
         cyclic_queue(const cyclic_queue& right)
@@ -86,14 +85,14 @@ namespace test_tasks
             return _count;
         }
 
-        _NODISCARD size_t size() const noexcept
+        _NODISCARD _CONSTEXPR17 size_t size() const noexcept
         {
-            return _size;
+            return Size;
         }
 
         _NODISCARD bool full() const noexcept
         {
-            return _count == Count;
+            return _count == Size;
         }
 
         _NODISCARD bool empty() const noexcept
@@ -103,12 +102,11 @@ namespace test_tasks
 
 
     private:
-        value_type _items[Count];
+        value_type _items[Size];
         index _head;
         index _tail;
 
         size_t _count;
-        size_t _size;
 
 
     private:
@@ -120,9 +118,8 @@ namespace test_tasks
             _head = right._head;
             _tail = right._tail;
             _count = right._count;
-            _size = right._size;
 
-            for (int i = 0; i < Count; ++i)
+            for (int i = 0; i < Size; ++i)
             {
                 _items[i] = right._items[i];
             }
@@ -136,13 +133,12 @@ namespace test_tasks
             _head = right._head;
             _tail = right._tail;
             _count = right._count;
-            _size = right._size;
 
             right._head = 0;
             right._tail = 0;
             right._count = 0;
 
-            for (int i = 0; i < Count; ++i)
+            for (int i = 0; i < Size; ++i)
             {
                 _items[i] = std::move(right._items[i]);
             }
@@ -150,10 +146,8 @@ namespace test_tasks
 
         index next_index(index ind) const
         {
-            index temp = ind + 1;
-            if (temp >= _size)
-                temp = 0;
-            return temp;
+            ++ind;
+            return ind >= Size ? 0 : ind;
         }
 
     };

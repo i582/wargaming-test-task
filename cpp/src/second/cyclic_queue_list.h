@@ -9,11 +9,12 @@ namespace test_tasks
     template <typename ItemType>
     class cyclic_queue_list_item
     {
-        using list_item = cyclic_queue_list_item;
+        using list_item     = cyclic_queue_list_item;
+        using value_type    = ItemType;
 
 
     public:
-        ItemType value;
+        value_type value;
         list_item* next;
 
 
@@ -27,7 +28,7 @@ namespace test_tasks
 
         cyclic_queue_list_item(list_item&& right) noexcept
         {
-            assign(std::forward<cyclic_queue_list_item>(right));
+            assign(std::forward<list_item>(right));
         }
 
 
@@ -40,7 +41,7 @@ namespace test_tasks
 
         list_item& operator=(list_item&& right) noexcept
         {
-            assign(std::forward<cyclic_queue_list_item>(right));
+            assign(std::forward<list_item>(right));
             return *this;
         }
 
@@ -60,10 +61,9 @@ namespace test_tasks
     };
 
 
-    template <typename ItemType, size_t Count>
+    template <typename ItemType, size_t Size>
     class cyclic_queue_list
     {
-    public:
         using value_type        = ItemType;
         using list              = cyclic_queue_list_item<value_type>;
         using list_pointer      = list*;
@@ -75,12 +75,11 @@ namespace test_tasks
             _head = _items;
             _tail = _items;
             _count = 0;
-            _size = Count;
 
-            for (int i = 0; i < Count - 1; ++i)
+            for (int i = 0; i < Size - 1; ++i)
                 _items[i].next = &_items[i + 1];
 
-            _items[Count - 1].next = &_items[0];
+            _items[Size - 1].next = &_items[0];
         }
 
         cyclic_queue_list(const cyclic_queue_list& right)
@@ -118,7 +117,7 @@ namespace test_tasks
             _head = _head->next;
         }
 
-        void push(value_type& item)
+        void push(const value_type& item)
         {
             if (full())
                 throw std::logic_error("Queue is full!");
@@ -146,14 +145,14 @@ namespace test_tasks
             return _count;
         }
 
-        _NODISCARD size_t size() const noexcept
+        _NODISCARD _CONSTEXPR17 size_t size() const noexcept
         {
-            return _size;
+            return Size;
         }
 
         _NODISCARD bool full() const noexcept
         {
-            return _count == Count;
+            return _count == Size;
         }
 
         _NODISCARD bool empty() const noexcept
@@ -163,12 +162,11 @@ namespace test_tasks
 
 
     private:
-        list _items[Count];
+        list _items[Size];
         list_pointer _head;
         list_pointer _tail;
 
         size_t _count;
-        size_t _size;
 
 
     private:
@@ -177,7 +175,7 @@ namespace test_tasks
             if (this == std::addressof(right))
                 return;
 
-            for (int i = 0; i < Count; ++i)
+            for (int i = 0; i < Size; ++i)
             {
                 _items[i] = right._items[i];
             }
@@ -190,7 +188,7 @@ namespace test_tasks
             if (this == std::addressof(right))
                 return;
 
-            for (int i = 0; i < Count; ++i)
+            for (int i = 0; i < Size; ++i)
             {
                 _items[i] = std::move(right._items[i]);
             }
@@ -205,11 +203,11 @@ namespace test_tasks
         void assign_setup(const cyclic_queue_list& right) noexcept
         {
             // reset pointer for list
-            for (int i = 0; i < Count - 1; ++i)
+            for (int i = 0; i < Size - 1; ++i)
             {
                 _items[i].next = &_items[i + 1];
             }
-            _items[Count - 1].next = &_items[0];
+            _items[Size - 1].next = &_items[0];
 
 
             // some pointer magic
@@ -221,7 +219,6 @@ namespace test_tasks
             _head = _items + right_index_head;
             _tail = _items + right_index_tail;
             _count = right._count;
-            _size = right._size;
         }
 
     };
