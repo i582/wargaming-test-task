@@ -1,7 +1,7 @@
 #pragma once
+#ifndef _CYCLIC_QUEUE_LIST_
+#define _CYCLIC_QUEUE_LIST_
 
-#include <stdexcept>
-#include <vcruntime.h>
 
 namespace test_tasks
 {
@@ -50,13 +50,15 @@ namespace test_tasks
         void assign(const list_item& right)
         {
             value = right.value;
-            next = right.next;
+            next = nullptr;
         }
 
         void assign(list_item&& right) noexcept
         {
-            value = std::move(right.value);
-            next = std::move(right.next);
+            // use move_if_noexcept, because the assign function is marked as noexcept.
+            value = std::move_if_noexcept(right.value);
+            next = nullptr;
+            right.next = nullptr;
         }
     };
 
@@ -64,9 +66,12 @@ namespace test_tasks
     template <typename ItemType, size_t Size>
     class cyclic_queue_list
     {
-        using value_type        = ItemType;
-        using list              = cyclic_queue_list_item<value_type>;
-        using list_pointer      = list*;
+        using value_type            = ItemType;
+        using list                  = cyclic_queue_list_item<value_type>;
+        using list_pointer          = list*;
+        using const_list_pointer    = const list* const;
+
+        using index                 = size_t;
 
 
     public:
@@ -190,13 +195,14 @@ namespace test_tasks
 
             for (int i = 0; i < Size; ++i)
             {
-                _items[i] = std::move(right._items[i]);
+                // use move_if_noexcept, because the assign function is marked as noexcept.
+                _items[i] = std::move_if_noexcept(right._items[i]);
             }
 
             assign_setup(right);
 
-            right._head = 0;
-            right._tail = 0;
+            right._head = nullptr;
+            right._tail = nullptr;
             right._count = 0;
         }
 
@@ -212,8 +218,9 @@ namespace test_tasks
 
             // some pointer magic
             // calculate shift for start of array
-            size_t right_index_head = static_cast<int>(right._head - &right._items[0]) / sizeof(right._head);
-            size_t right_index_tail = static_cast<int>(right._tail - &right._items[0]) / sizeof(right._tail);
+            index right_index_head = get_index_for_pointer(right._items, right._head);
+            index right_index_tail = get_index_for_pointer(right._items, right._tail);
+
 
             // and here set new pointers
             _head = _items + right_index_head;
@@ -221,6 +228,14 @@ namespace test_tasks
             _count = right._count;
         }
 
+
+        _NODISCARD static index get_index_for_pointer(const_list_pointer rel_list, const_list_pointer ptr) noexcept
+        {
+            return static_cast<index>(static_cast<int>(ptr - rel_list) / sizeof(ptr));
+        }
+
     };
 
 }
+
+#endif // _CYCLIC_QUEUE_LIST_

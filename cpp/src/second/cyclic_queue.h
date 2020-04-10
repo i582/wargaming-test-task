@@ -1,7 +1,8 @@
 #pragma once
 
-#include <stdexcept>
-#include <vcruntime.h>
+#ifndef _CYCLIC_QUEUE_
+#define _CYCLIC_QUEUE_
+
 
 namespace test_tasks
 {
@@ -15,7 +16,7 @@ namespace test_tasks
 
 
     public:
-        cyclic_queue()
+        cyclic_queue() noexcept
         {
             _head = 0;
             _tail = 0;
@@ -140,11 +141,12 @@ namespace test_tasks
 
             for (int i = 0; i < Size; ++i)
             {
-                _items[i] = std::move(right._items[i]);
+                // use move_if_noexcept, because the assign function is marked as noexcept.
+                _items[i] = std::move_if_noexcept(right._items[i]);
             }
         }
 
-        index next_index(index ind) const
+        _NODISCARD _CONSTEXPR17 index next_index(index ind) const noexcept
         {
             ++ind;
             return ind >= Size ? 0 : ind;
@@ -153,3 +155,5 @@ namespace test_tasks
     };
 
 }
+
+#endif // _CYCLIC_QUEUE_

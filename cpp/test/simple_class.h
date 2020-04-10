@@ -1,17 +1,18 @@
 #pragma once
 #include "string"
-#include "vcruntime.h"
 
-using _STD string;
+using std::string;
 
 class SimpleClass
 {
+private:
     string _name;
 
-public:
 
+public:
     SimpleClass() = default;
-    SimpleClass& operator=(const SimpleClass& right) = default;
+
+    explicit SimpleClass(string name) : _name(std::move(name)) {}
 
     SimpleClass(const SimpleClass& right)
     {
@@ -20,25 +21,27 @@ public:
 
     SimpleClass(SimpleClass&& right) noexcept
     {
-        _name = std::move(right._name);
+        _name = std::move_if_noexcept(right._name);
     }
+
+    SimpleClass& operator=(const SimpleClass& right) = default;
 
     SimpleClass& operator=(SimpleClass&& right) noexcept
     {
-        _name = std::move(right._name);
+        _name = std::move_if_noexcept(right._name);
         return *this;
     }
 
-    explicit SimpleClass(string name) : _name(std::move(name))
-    {}
 
-    _NODISCARD string name() const
+public:
+    _NODISCARD string name() const noexcept
     {
         return _name;
     }
 
-    void name(const string& name)
+    void name(const string& name) noexcept
     {
         _name = name;
     }
+
 };
