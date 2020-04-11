@@ -4,7 +4,7 @@
 
 TEST(test_dynamic_dynamic_cyclic_queue, test_dynamic_dynamic_cyclic_queue_with_pod)
 {
-    test_tasks::dynamic_cyclic_queue<int> queue1(5);
+    test_tasks::impl_on_array::dynamically::cyclic_queue<int> queue1(5);
 
     // queue is empty, so throw exception
     EXPECT_ANY_THROW(queue1.pop());
@@ -73,7 +73,7 @@ TEST(test_dynamic_dynamic_cyclic_queue, test_dynamic_dynamic_cyclic_queue_with_p
 
 TEST(test_dynamic_dynamic_cyclic_queue, test_dynamic_dynamic_cyclic_queue_with_class_object)
 {
-    test_tasks::dynamic_cyclic_queue<SimpleClass> queue1(5);
+    test_tasks::impl_on_array::dynamically::cyclic_queue<SimpleClass> queue1(5);
 
     SimpleClass el("Ivan");
     SimpleClass el1("Alexey");
@@ -110,14 +110,14 @@ TEST(test_dynamic_dynamic_cyclic_queue, test_dynamic_dynamic_cyclic_queue_with_c
     queue1.push(el);
     queue1.push(el2);
 
-    test_tasks::dynamic_cyclic_queue<SimpleClass> queue2(queue1);
+    test_tasks::impl_on_array::dynamically::cyclic_queue<SimpleClass> queue2(queue1);
 
     EXPECT_EQ(queue1.pop().name(), queue2.pop().name());
     EXPECT_EQ(queue1.pop().name(), queue2.pop().name());
 
 
     // move constructor
-    test_tasks::dynamic_cyclic_queue<SimpleClass> queue3(std::move(queue1));
+    test_tasks::impl_on_array::dynamically::cyclic_queue<SimpleClass> queue3(std::move(queue1));
 
     // queue1 was moved, so pop throw exception
     EXPECT_ANY_THROW(queue1.pop());
@@ -125,7 +125,7 @@ TEST(test_dynamic_dynamic_cyclic_queue, test_dynamic_dynamic_cyclic_queue_with_c
     EXPECT_EQ(queue1.count(), 0);
 
 
-    test_tasks::dynamic_cyclic_queue<SimpleClass> queue4(0);
+    test_tasks::impl_on_array::dynamically::cyclic_queue<SimpleClass> queue4(0);
 
     queue4.resize(10);
 

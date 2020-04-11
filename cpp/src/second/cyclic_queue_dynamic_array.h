@@ -9,9 +9,13 @@
 
 namespace test_tasks
 {
+namespace impl_on_array
+{
+namespace dynamically
+{
 
-    template <typename ElementType, class Alloc = std::allocator<ElementType>>
-    class dynamic_cyclic_queue
+    template<typename ElementType, class Alloc = std::allocator<ElementType>>
+    class cyclic_queue
     {
     public:
         using value_type        = ElementType;
@@ -23,7 +27,7 @@ namespace test_tasks
 
 
     public:
-        dynamic_cyclic_queue() noexcept
+        cyclic_queue() noexcept
         {
             _elems = nullptr;
             _head = 0;
@@ -34,7 +38,7 @@ namespace test_tasks
             _alloc = std::allocator<value_type>();
         }
 
-        explicit dynamic_cyclic_queue(size_t size, const allocator& alloc = std::allocator<value_type>())
+        explicit cyclic_queue(size_t size, const allocator& alloc = std::allocator<value_type>())
         {
             _head = 0;
             _tail = 0;
@@ -48,7 +52,7 @@ namespace test_tasks
             _elems = _alloc.allocate(_size);
         }
 
-        dynamic_cyclic_queue(const dynamic_cyclic_queue& right)
+        cyclic_queue(const cyclic_queue& right)
         {
             _elems = nullptr;
             _head = 0;
@@ -59,29 +63,29 @@ namespace test_tasks
             assign(right);
         }
 
-        dynamic_cyclic_queue(dynamic_cyclic_queue&& right) noexcept
+        cyclic_queue(cyclic_queue&& right) noexcept
         {
             assign(std::move(right));
         }
 
-        ~dynamic_cyclic_queue()
+        ~cyclic_queue()
         {
             if (_elems == nullptr)
                 return;
 
             alloc_traits::destroy(_alloc, _elems);
-           _alloc.deallocate(_elems, _size);
+            _alloc.deallocate(_elems, _size);
         }
 
 
     public:
-        dynamic_cyclic_queue& operator=(const dynamic_cyclic_queue& right)
+        cyclic_queue& operator=(const cyclic_queue& right)
         {
             assign(right);
             return *this;
         }
 
-        dynamic_cyclic_queue& operator=(dynamic_cyclic_queue&& right) noexcept
+        cyclic_queue& operator=(cyclic_queue&& right) noexcept
         {
             assign(std::move(right));
             return *this;
@@ -157,8 +161,8 @@ namespace test_tasks
             _size = new_size;
         }
 
-        template <typename... Valty>
-        void emplace(Valty&&... val)
+        template<typename... Valty>
+        void emplace(Valty&& ... val)
         {
             if (full())
                 throw std::logic_error("Queue is full!");
@@ -199,7 +203,7 @@ namespace test_tasks
 
     private:
         size_t move(elem_pointer from, size_t from_size, index_t tail_index, size_t count_copy,
-                    elem_pointer to,   size_t to_size) noexcept
+                    elem_pointer to, size_t to_size) noexcept
         {
             index_t index = tail_index;
             size_t count_element_for_move = std::min(std::min(from_size, to_size), count_copy);
@@ -214,7 +218,7 @@ namespace test_tasks
         }
 
         size_t copy(elem_pointer from, size_t from_size, index_t tail_index, size_t count_copy,
-                    elem_pointer to,   size_t to_size)
+                    elem_pointer to, size_t to_size)
         {
             index_t index = tail_index;
             size_t count_element_for_copy = std::min(std::min(from_size, to_size), count_copy);
@@ -230,7 +234,7 @@ namespace test_tasks
 
 
     private:
-        void assign(const dynamic_cyclic_queue& right)
+        void assign(const cyclic_queue& right)
         {
             if (this == std::addressof(right))
                 return;
@@ -273,7 +277,7 @@ namespace test_tasks
             _count = count_copy;
         }
 
-        void assign(dynamic_cyclic_queue&& right) noexcept
+        void assign(cyclic_queue&& right) noexcept
         {
             if (this == std::addressof(right))
                 return;
@@ -299,6 +303,8 @@ namespace test_tasks
 
     };
 
+}
+}
 }
 
 #endif // _CYCLIC_QUEUE_DYNAMIC_ARRAY_

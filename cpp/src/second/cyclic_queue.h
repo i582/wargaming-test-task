@@ -5,8 +5,13 @@
 
 #include <yvals_core.h>
 #include <xmemory>
+#include <stdexcept>
 
 namespace test_tasks
+{
+namespace impl_on_array
+{
+namespace statically
 {
 
     template <typename ElementType, size_t Size>
@@ -171,6 +176,8 @@ namespace test_tasks
 
     };
 
+}
+}
 }
 
 #endif // _CYCLIC_QUEUE_

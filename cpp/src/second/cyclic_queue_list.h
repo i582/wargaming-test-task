@@ -4,33 +4,38 @@
 
 #include <yvals_core.h>
 #include <xmemory>
+#include <stdexcept>
 
 namespace test_tasks
 {
+namespace impl_on_list
+{
+namespace statically
+{
 
-    template <typename ItemType>
-    class cyclic_queue_list_item
+    template<typename ItemType>
+    class cyclic_queue_item
     {
-        using list_item     = cyclic_queue_list_item;
+        using list_item     = cyclic_queue_item;
         using value_type    = ItemType;
 
 
     public:
         value_type value;
         list_item* next;
-
+        
 
     public:
-        cyclic_queue_list_item() = default;
+        cyclic_queue_item() = default;
 
-        cyclic_queue_list_item(const list_item& right)
+        cyclic_queue_item(const list_item& right)
         {
             assign(right);
         }
 
-        cyclic_queue_list_item(list_item&& right) noexcept
+        cyclic_queue_item(list_item&& right) noexcept
         {
-            assign(std::forward<list_item>(right));
+            assign(std::move(right));
         }
 
 
@@ -43,7 +48,7 @@ namespace test_tasks
 
         list_item& operator=(list_item&& right) noexcept
         {
-            assign(std::forward<list_item>(right));
+            assign(std::move(right));
             return *this;
         }
 
@@ -65,11 +70,11 @@ namespace test_tasks
     };
 
 
-    template <typename ElementType, size_t Size>
-    class cyclic_queue_list
+    template<typename ElementType, size_t Size>
+    class cyclic_queue
     {
         using value_type            = ElementType;
-        using list                  = cyclic_queue_list_item<value_type>;
+        using list                  = cyclic_queue_item<value_type>;
         using list_pointer          = list*;
         using const_list_pointer    = const list* const;
 
@@ -77,8 +82,9 @@ namespace test_tasks
 
         using alloc_traits          = std::allocator_traits<std::allocator<ElementType>>;
 
+
     public:
-        cyclic_queue_list()
+        cyclic_queue()
         {
             _head = _elems;
             _tail = _elems;
@@ -90,27 +96,27 @@ namespace test_tasks
             _elems[Size - 1].next = &_elems[0];
         }
 
-        cyclic_queue_list(const cyclic_queue_list& right)
+        cyclic_queue(const cyclic_queue& right)
         {
             assign(right);
         }
 
-        cyclic_queue_list(cyclic_queue_list&& right) noexcept
+        cyclic_queue(cyclic_queue&& right) noexcept
         {
-            assign(std::forward<cyclic_queue_list>(right));
+            assign(std::forward<cyclic_queue>(right));
         }
 
 
     public:
-        cyclic_queue_list& operator=(const cyclic_queue_list& right)
+        cyclic_queue& operator=(const cyclic_queue& right)
         {
             assign(right);
             return *this;
         }
 
-        cyclic_queue_list& operator=(cyclic_queue_list&& right) noexcept
+        cyclic_queue& operator=(cyclic_queue&& right) noexcept
         {
-            assign(std::forward<cyclic_queue_list>(right));
+            assign(std::forward<cyclic_queue>(right));
             return *this;
         }
 
@@ -124,7 +130,7 @@ namespace test_tasks
             emplace(std::move_if_noexcept(elem));
         }
 
-        template <typename Valty>
+        template<typename Valty>
         void emplace(Valty&& val)
         {
             if (full())
@@ -174,8 +180,8 @@ namespace test_tasks
                 return;
 
             alloc_traits::destroy(_alloc, _elems);
-            _head = 0;
-            _tail = 0;
+            _head = nullptr;
+            _tail = nullptr;
             _count = 0;
         }
 
@@ -190,7 +196,7 @@ namespace test_tasks
         std::allocator<value_type> _alloc;
 
     private:
-        void assign(const cyclic_queue_list& right)
+        void assign(const cyclic_queue& right)
         {
             if (this == std::addressof(right))
                 return;
@@ -203,7 +209,7 @@ namespace test_tasks
             assign_setup(right);
         }
 
-        void assign(cyclic_queue_list&& right) noexcept
+        void assign(cyclic_queue&& right) noexcept
         {
             if (this == std::addressof(right))
                 return;
@@ -221,7 +227,7 @@ namespace test_tasks
             right._count = 0;
         }
 
-        void assign_setup(const cyclic_queue_list& right) noexcept
+        void assign_setup(const cyclic_queue& right) noexcept
         {
             // reset pointer for list
             for (int i = 0; i < Size - 1; ++i)
@@ -244,13 +250,16 @@ namespace test_tasks
         }
 
 
-        _NODISCARD static index_t get_index_for_pointer(const_list_pointer rel_list, const_list_pointer ptr) noexcept
+        _NODISCARD static index_t
+        get_index_for_pointer(const_list_pointer rel_list, const_list_pointer ptr) noexcept
         {
             return static_cast<index_t>(static_cast<int>(ptr - rel_list) / sizeof(ptr));
         }
 
     };
 
+}
+}
 }
 
 #endif // _CYCLIC_QUEUE_LIST_
