@@ -24,7 +24,11 @@ public:
         _name = std::move_if_noexcept(right._name);
     }
 
-    SimpleClass& operator=(const SimpleClass& right) = default;
+    SimpleClass& operator=(const SimpleClass& right)
+    {
+        _name = right._name;
+        return *this;
+    }
 
     SimpleClass& operator=(SimpleClass&& right) noexcept
     {

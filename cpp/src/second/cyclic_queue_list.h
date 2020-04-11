@@ -2,6 +2,8 @@
 #ifndef _CYCLIC_QUEUE_LIST_
 #define _CYCLIC_QUEUE_LIST_
 
+#include <yvals_core.h>
+#include <xmemory>
 
 namespace test_tasks
 {
@@ -63,28 +65,29 @@ namespace test_tasks
     };
 
 
-    template <typename ItemType, size_t Size>
+    template <typename ElementType, size_t Size>
     class cyclic_queue_list
     {
-        using value_type            = ItemType;
+        using value_type            = ElementType;
         using list                  = cyclic_queue_list_item<value_type>;
         using list_pointer          = list*;
         using const_list_pointer    = const list* const;
 
-        using index                 = size_t;
+        using index_t               = size_t;
 
+        using alloc_traits          = std::allocator_traits<std::allocator<ElementType>>;
 
     public:
         cyclic_queue_list()
         {
-            _head = _items;
-            _tail = _items;
+            _head = _elems;
+            _tail = _elems;
             _count = 0;
 
             for (int i = 0; i < Size - 1; ++i)
-                _items[i].next = &_items[i + 1];
+                _elems[i].next = &_elems[i + 1];
 
-            _items[Size - 1].next = &_items[0];
+            _elems[Size - 1].next = &_elems[0];
         }
 
         cyclic_queue_list(const cyclic_queue_list& right)
@@ -111,23 +114,23 @@ namespace test_tasks
             return *this;
         }
 
-        void push(value_type&& item)
+        void push(const value_type& elem)
         {
-            if (full())
-                throw std::logic_error("Queue is full!");
-
-            _head->value = std::move(item);
-
-            ++_count;
-            _head = _head->next;
+            emplace(elem);
         }
 
-        void push(const value_type& item)
+        void push(value_type&& elem) noexcept
+        {
+            emplace(std::move_if_noexcept(elem));
+        }
+
+        template <typename Valty>
+        void emplace(Valty&& val)
         {
             if (full())
                 throw std::logic_error("Queue is full!");
 
-            _head->value = item;
+            _head->value = std::forward<Valty>(val);
 
             ++_count;
             _head = _head->next;
@@ -138,11 +141,11 @@ namespace test_tasks
             if (empty())
                 throw std::logic_error("Queue is empty!");
 
-            value_type item = std::move(_tail->value);
+            value_type elem = std::move(_tail->value);
 
             --_count;
             _tail = _tail->next;
-            return item;
+            return elem;
         }
 
         _NODISCARD size_t count() const noexcept
@@ -165,14 +168,26 @@ namespace test_tasks
             return _count == 0;
         }
 
+        void clear() noexcept
+        {
+            if (_elems == nullptr)
+                return;
+
+            alloc_traits::destroy(_alloc, _elems);
+            _head = 0;
+            _tail = 0;
+            _count = 0;
+        }
+
 
     private:
-        list _items[Size];
+        list _elems[Size];
         list_pointer _head;
         list_pointer _tail;
 
         size_t _count;
 
+        std::allocator<value_type> _alloc;
 
     private:
         void assign(const cyclic_queue_list& right)
@@ -182,7 +197,7 @@ namespace test_tasks
 
             for (int i = 0; i < Size; ++i)
             {
-                _items[i] = right._items[i];
+                _elems[i] = right._elems[i];
             }
 
             assign_setup(right);
@@ -196,7 +211,7 @@ namespace test_tasks
             for (int i = 0; i < Size; ++i)
             {
                 // use move_if_noexcept, because the assign function is marked as noexcept.
-                _items[i] = std::move_if_noexcept(right._items[i]);
+                _elems[i] = std::move_if_noexcept(right._elems[i]);
             }
 
             assign_setup(right);
@@ -211,27 +226,27 @@ namespace test_tasks
             // reset pointer for list
             for (int i = 0; i < Size - 1; ++i)
             {
-                _items[i].next = &_items[i + 1];
+                _elems[i].next = &_elems[i + 1];
             }
-            _items[Size - 1].next = &_items[0];
+            _elems[Size - 1].next = &_elems[0];
 
 
             // some pointer magic
             // calculate shift for start of array
-            index right_index_head = get_index_for_pointer(right._items, right._head);
-            index right_index_tail = get_index_for_pointer(right._items, right._tail);
+            index_t right_index_head = get_index_for_pointer(right._elems, right._head);
+            index_t right_index_tail = get_index_for_pointer(right._elems, right._tail);
 
 
             // and here set new pointers
-            _head = _items + right_index_head;
-            _tail = _items + right_index_tail;
+            _head = _elems + right_index_head;
+            _tail = _elems + right_index_tail;
             _count = right._count;
         }
 
 
-        _NODISCARD static index get_index_for_pointer(const_list_pointer rel_list, const_list_pointer ptr) noexcept
+        _NODISCARD static index_t get_index_for_pointer(const_list_pointer rel_list, const_list_pointer ptr) noexcept
         {
-            return static_cast<index>(static_cast<int>(ptr - rel_list) / sizeof(ptr));
+            return static_cast<index_t>(static_cast<int>(ptr - rel_list) / sizeof(ptr));
         }
 
     };
