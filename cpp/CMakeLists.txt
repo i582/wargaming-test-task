@@ -7,6 +7,6 @@ set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(test)
 enable_testing()
 
-set(SOURCES main.cpp src/first/is_even.h src/second/cyclic_queue.h src/second/cyclic_queue_list.h)
+set(SOURCES main.cpp src/first/is_even.h src/second/cyclic_queue.h src/second/cyclic_queue_list.h src/second/cyclic_queue_dynamic_array.h)
 
 add_executable(wargaming_test_tasks ${SOURCES})

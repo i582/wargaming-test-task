@@ -10,7 +10,11 @@ set(TEST_SOURCES
         ../src/second/cyclic_queue.h
         ../src/second/cyclic_queue_list.h
         test-cyclic-queue.cpp
-        test-cyclic-queue-list.cpp simple_class.h test_even.cpp)
+        test-dynamic-cyclic-queue.cpp
+        test-cyclic-queue-list.cpp
+        simple_class.h
+        test_even.cpp
+        ../src/second/cyclic_queue_dynamic_array.h)
 
 add_subdirectory(googletest)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
