@@ -3,7 +3,6 @@
 #ifndef _CYCLIC_QUEUE_DYNAMIC_ARRAY_
 #define _CYCLIC_QUEUE_DYNAMIC_ARRAY_
 
-#include <yvals_core.h>
 #include <xmemory>
 #include <algorithm>
 
@@ -14,7 +13,7 @@ namespace impl_on_array
 namespace dynamically
 {
 
-    template<typename ElementType, class Alloc = std::allocator<ElementType>>
+    template <typename ElementType, class Alloc = std::allocator<ElementType>>
     class cyclic_queue
     {
     public:
@@ -87,8 +86,13 @@ namespace dynamically
 
         cyclic_queue& operator=(cyclic_queue&& right) noexcept
         {
-            assign(std::move(right));
+            assign(std::move_if_noexcept(right));
             return *this;
+        }
+
+        void push(const value_type& elem)
+        {
+            emplace(elem);
         }
 
         void push(value_type&& elem)
@@ -96,9 +100,16 @@ namespace dynamically
             emplace(std::move(elem));
         }
 
-        void push(const value_type& elem)
+        template<typename... Valty>
+        void emplace(Valty&&... val)
         {
-            emplace(elem);
+            if (full())
+                throw std::logic_error("Queue is full!");
+
+            alloc_traits::construct(_alloc, _elems + _head, std::forward<Valty>(val)...);
+
+            ++_count;
+            _head = next_index(_head, _size);
         }
 
         _NODISCARD value_type pop()
@@ -159,18 +170,6 @@ namespace dynamically
             _head = std::min(_count, new_size);
             _tail = 0;
             _size = new_size;
-        }
-
-        template<typename... Valty>
-        void emplace(Valty&& ... val)
-        {
-            if (full())
-                throw std::logic_error("Queue is full!");
-
-            alloc_traits::construct(_alloc, _elems + _head, std::forward<Valty>(val)...);
-
-            ++_count;
-            _head = next_index(_head, _size);
         }
 
         void clear() noexcept
@@ -241,7 +240,9 @@ namespace dynamically
 
             if (_size == right._size)
             {
-                // copy all elements from right
+                // for begin destroy elements
+                alloc_traits::destroy(_alloc, _elems);
+                // and after copy all elements from right
                 auto count_copy = copy(right._elems, right._size, right._tail, right._count, _elems, _size);
 
                 // if both queue were full, copied equal size, so head should be 0
@@ -261,7 +262,7 @@ namespace dynamically
                 _alloc.deallocate(_elems, _size);
             }
 
-            // set allocator from right before deallocate
+            // set allocator from right after deallocate
             _alloc = right._alloc;
 
             // allocate new memory with size equal right

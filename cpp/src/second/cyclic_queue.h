@@ -3,7 +3,6 @@
 #ifndef _CYCLIC_QUEUE_
 #define _CYCLIC_QUEUE_
 
-#include <yvals_core.h>
 #include <xmemory>
 #include <stdexcept>
 
@@ -39,7 +38,7 @@ namespace statically
 
         cyclic_queue(cyclic_queue&& right) noexcept
         {
-            assign(std::move(right));
+            assign(std::move_if_noexcept(right));
         }
 
 
@@ -52,7 +51,7 @@ namespace statically
 
         cyclic_queue& operator=(cyclic_queue&& right) noexcept
         {
-            assign(std::move(right));
+            assign(std::move_if_noexcept(right));
             return *this;
         }
 
