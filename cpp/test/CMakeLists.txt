@@ -14,7 +14,7 @@ set(TEST_SOURCES
         test-cyclic-queue-list.cpp
         simple_class.h
         test_even.cpp
-        ../src/second/cyclic_queue_dynamic_array.h)
+        ../src/second/cyclic_queue_dynamic_array.h my_allocator.h)
 
 add_subdirectory(googletest)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})

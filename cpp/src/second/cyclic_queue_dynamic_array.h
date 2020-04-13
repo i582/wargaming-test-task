@@ -72,7 +72,8 @@ namespace dynamically
             if (_elems == nullptr)
                 return;
 
-            alloc_traits::destroy(_alloc, _elems);
+            clear();
+
             _alloc.deallocate(_elems, _size);
         }
 
@@ -158,7 +159,10 @@ namespace dynamically
             if (_elems != nullptr)
             {
                 // destroy their
-                alloc_traits::destroy(_alloc, _elems);
+                for (size_t i = 0; i < _count; ++i)
+                {
+                    alloc_traits::destroy(_alloc, _elems + i);
+                }
                 // and deallocate memory
                 _alloc.deallocate(_elems, _size);
             }
@@ -172,12 +176,16 @@ namespace dynamically
             _size = new_size;
         }
 
-        void clear() noexcept
+        void clear()
         {
             if (_elems == nullptr)
                 return;
 
-            alloc_traits::destroy(_alloc, _elems);
+            for (size_t i = 0; i < _count; ++i)
+            {
+                alloc_traits::destroy(_alloc, _elems + i);
+            }
+
             _head = 0;
             _tail = 0;
             _count = 0;
@@ -241,7 +249,10 @@ namespace dynamically
             if (_size == right._size)
             {
                 // for begin destroy elements
-                alloc_traits::destroy(_alloc, _elems);
+                for (size_t i = 0; i < _count; ++i)
+                {
+                    alloc_traits::destroy(_alloc, _elems + i);
+                }
                 // and after copy all elements from right
                 auto count_copy = copy(right._elems, right._size, right._tail, right._count, _elems, _size);
 
@@ -257,7 +268,10 @@ namespace dynamically
             if (_elems != nullptr)
             {
                 // destroy their
-                alloc_traits::destroy(_alloc, _elems);
+                for (size_t i = 0; i < _count; ++i)
+                {
+                    alloc_traits::destroy(_alloc, _elems + i);
+                }
                 // and deallocate memory
                 _alloc.deallocate(_elems, _size);
             }
