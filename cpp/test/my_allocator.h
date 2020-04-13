@@ -16,15 +16,16 @@ public:
     static size_t count_construct;
     static size_t count_destroy;
 
+
 public:
-    constexpr static value_type* allocate(size_t size)
+    static value_type* allocate(size_t size)
     {
         ++count_allocate;
         std::cout << "allocate memory" << std::endl;
         return std::allocator<value_type>().allocate(size);
     }
 
-    constexpr static void deallocate(value_type* pointer, size_t size)
+    static void deallocate(value_type* pointer, size_t size)
     {
         ++count_deallocate;
         std::cout << "deallocate memory" << std::endl;
@@ -32,14 +33,14 @@ public:
     }
 
     template <class... types>
-    constexpr static void construct(value_type* pointer, types&&... args)
+    static void construct(value_type* pointer, types&&... args)
     {
         ++count_construct;
         std::cout << "construct" << std::endl;
         alloc_traits::construct(std::allocator<value_type>(), pointer, std::forward<types>(args)...);
     }
 
-    constexpr static void destroy(value_type* pointer)
+    static void destroy(value_type* pointer)
     {
         ++count_destroy;
         std::cout << "destroy" << std::endl;
@@ -47,7 +48,6 @@ public:
     }
 
 };
-
 
 template<typename T>
 size_t MyAllocator<T>::count_allocate = 0;
