@@ -1,3 +1,4 @@
+#include "iostream"
 #include <gtest/gtest.h>
 #include "simple_class.h"
 #include "../src/second/cyclic_queue_dynamic_array.h"
@@ -156,3 +157,34 @@ TEST(test_dynamic_dynamic_cyclic_queue, test_dynamic_dynamic_cyclic_queue_with_c
     EXPECT_EQ(queue4.pop().name(), "People");
 }
 
+
+#include "my_allocator.h"
+
+TEST(test_dynamic_dynamic_cyclic_queue, test_dynamic_dynamic_cyclic_queue_with_other_allocator)
+{
+    using MAi = MyAllocator<int>;
+
+
+    test_tasks::impl_on_array::dynamically::
+    cyclic_queue<int, MyAllocator<int>> queue1(5, MyAllocator<int>());
+
+    queue1.push(100);
+    queue1.push(100);
+    queue1.push(100);
+    queue1.push(100);
+    queue1.push(100);
+
+
+
+    EXPECT_EQ(MAi::count_allocate, 1);
+    EXPECT_EQ(MAi::count_construct, 5);
+
+
+    queue1.resize(10);
+
+
+    EXPECT_EQ(MAi::count_allocate, 1 + 1);
+    EXPECT_EQ(MAi::count_construct, 5 + 5);
+    EXPECT_EQ(MAi::count_destroy, 0 + 5);
+    EXPECT_EQ(MAi::count_deallocate, 0 + 1);
+}
